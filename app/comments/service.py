@@ -65,6 +65,7 @@ def build_response(items):
     for item in items:
         results["_id"] = str(item.get("_id"))
         results["name"] = str(item.get("name"))
+        results["email"] = str(item.get("email"))
         results["movie_id"] = str(item.get("movie_id"))
         results["type"] = str(item.get("type"))
         results["date"] = str(item.get("date"))

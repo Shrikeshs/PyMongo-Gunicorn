@@ -3,8 +3,6 @@ import json
 from bson import ObjectId
 from flask import request, Blueprint, jsonify, abort, make_response
 
-from app.models import Response
-
 comment_blueprint = Blueprint("comment", __name__, url_prefix='/comments')
 
 
@@ -14,10 +12,10 @@ def create_comments():
     if request_json is None or len(request_json) == 0:
         abort(400, description="The Incoming Request if empty")
     request_json["movie_id"] = ObjectId(request_json.get("movie_id"))
-    from app.comments.service import db_create_comment
+    from app.comments.service import db_create_comment,db_query_comments
     id_inserted = db_create_comment(request_json)
-    response_obj = Response(str(id_inserted.inserted_id))
-    response = make_response(response_obj.__dict__, 200)
+    items = db_query_comments({'_id': ObjectId(id_inserted.inserted_id)})
+    response = make_response(json.dumps(items), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
@@ -29,8 +27,7 @@ def delete_comment(id):
         abort(400, description="The id to delete cannot be empty")
     from app.comments.service import db_delete_comment
     db_delete_comment(id_to_delete)
-    response_obj = Response(str(id_to_delete))
-    response = make_response(response_obj.__dict__, 204)
+    response = make_response("Deleted", 204)
     response.headers["Content-Type"] = "application/json"
     return response
 

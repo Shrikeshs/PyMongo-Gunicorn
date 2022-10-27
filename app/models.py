@@ -14,8 +14,3 @@ class Users:
         self.name = name
         self.email = email
         self.password = password
-
-
-class Response:
-    def __init__(self, _id=str()) -> None:
-        self._id = _id
