@@ -3,6 +3,8 @@ import json
 from bson import ObjectId
 from flask import request, Blueprint, jsonify, abort, make_response
 
+
+
 comment_blueprint = Blueprint("comment", __name__, url_prefix='/comments')
 
 
@@ -12,7 +14,7 @@ def create_comments():
     if request_json is None or len(request_json) == 0:
         abort(400, description="The Incoming Request if empty")
     request_json["movie_id"] = ObjectId(request_json.get("movie_id"))
-    from app.comments.service import db_create_comment,db_query_comments
+    from app.comments.service import db_create_comment, db_query_comments
     id_inserted = db_create_comment(request_json)
     items = db_query_comments({'_id': ObjectId(id_inserted.inserted_id)})
     response = make_response(json.dumps(items), 200)

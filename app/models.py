@@ -14,3 +14,13 @@ class Users:
         self.name = name
         self.email = email
         self.password = password
+
+
+class Response:
+    def __init__(self, report_name=str(), status=str(), date=str()) -> None:
+        self.report_name = report_name
+        self.status = status
+        self.date = date
+
+
+

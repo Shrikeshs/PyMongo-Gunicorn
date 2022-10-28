@@ -33,6 +33,7 @@ def db_update_comment(request, comment_id):
 
 
 
+
 def build_cond_dict(json):
     email = json.get("email")
     name = json.get("name")
@@ -47,6 +48,8 @@ def build_cond_dict(json):
         cond_dict['movie_id'] = ObjectId(movie_id)
     if comment_type is not None:
         cond_dict['type'] = comment_type
+    current_time = datetime.now()
+    cond_dict['date'] = current_time
     return cond_dict
 
 
