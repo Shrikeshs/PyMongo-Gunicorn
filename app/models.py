@@ -17,5 +17,10 @@ class Users:
 
 
 class Response:
-    def __init__(self, _id=str()) -> None:
-        self._id = _id
+    def __init__(self, report_name=str(), status=str(), date=str()) -> None:
+        self.report_name = report_name
+        self.status = status
+        self.date = date
+
+
+
