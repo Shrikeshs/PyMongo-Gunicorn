@@ -8,8 +8,6 @@ from db import get_database
 from config import debug
 
 db = get_database()
-
-
 def create_app():
     flask_app = Flask(__name__)
     flask_app.register_blueprint(comment_blueprint)

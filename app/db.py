@@ -10,6 +10,6 @@ def get_database():
     CONNECTION_STRING = mongo_connection_url
 
     # Create a connection using MongoClient
-    client = MongoClient(CONNECTION_STRING, tlsCAFile=certifi.where(), connect=False)
+    client = motor.motor_asyncio.AsyncIOMotorClient(CONNECTION_STRING,tlsCAFile=certifi.where(), connect=False)
     # Return the Database of our interest
     return client[db_name]

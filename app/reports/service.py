@@ -1,5 +1,6 @@
 import asyncio
 from abc import abstractmethod
+from typing import Any
 
 from app.main import db
 
@@ -8,16 +9,16 @@ collection_name = db["comments"]
 
 class Report:
     @abstractmethod
-    async def generate_reports(self) -> None:
+    async def generate_reports(self) -> list[Any]:
         pass
 
     @abstractmethod
-    def get_report_name(self):
+    def get_report_name(self) -> str:
         pass
 
 
 class TopFiveCommenters(Report):
-    async def generate_reports(self) -> None:
+    async def generate_reports(self) -> list[Any]:
         stage_group_comment = {
             "$group": {
                 "_id": "$name",
@@ -27,9 +28,11 @@ class TopFiveCommenters(Report):
         sort = {"$sort": {"comment_count": -1}}
         limit = {"$limit": 5}
         pipeline = [stage_group_comment, sort, limit]
-        results = collection_name.aggregate(pipeline)
         await asyncio.sleep(5)
-        return results
+        result = []
+        async for doc in collection_name.aggregate(pipeline):
+            result.append(doc)
+        return result
 
     def get_report_name(self):
         return "Top Five Commenters"
