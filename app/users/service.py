@@ -1,5 +1,5 @@
 from bson import ObjectId
-from app.main import db
+from app.util import db
 
 collection_name = db["users"]
 
