@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import threading
 
@@ -15,24 +16,60 @@ work_queue = asyncio.Queue(5)
 
 @report_blueprint.route('/', methods=['POST'])
 async def report_generator():
+    """
+     Endpoint for report generation
+     Returns:
+         Json response of the Id of the report stored in Mongo Db
+     """
     if work_queue.full():
-        logging.debug('Worker is full...')
+        logging.warning('Worker is full.')
         abort(400, description="Worker is full, please try after sometime")
     report_name = request.json["report_name"]
-    request_args = request.args
-    k = request_args["k"]
+    k = request.json["k"]
     report_obj = list_of_reports[report_name]
     from app.util import loop
-    report_status_task = insert_report_status(report_name, 'pending', [])
+    result_dict = insert_report_status(report_name, 'pending', [])
     logging.info('Report has been inserted to MongoDb')
-    reports_task = loop.create_task(report_obj.generate_reports(k, report_status_task.inserted_id))
+    reports_task = loop.create_task(report_obj.generate_reports(k, result_dict["_id"]))
     work_queue.put_nowait(reports_task)
-    response = make_response(dumps(report_status_task.inserted_id), 202)
+    response = make_response(json.dumps(result_dict), 202)
+    response.headers["Content-Type"] = "application/json"
+    return response
+
+
+@report_blueprint.route('/<id>', methods=['POST'])
+def report_status(id):
+    """
+       Endpoint for report result polling
+
+       Parameters:
+           id (str):The report id that is to be retrieved
+
+       Returns:
+           Json response of the report status structured as follows
+            _id = id of report
+            name = name of the required report
+            status = status of the report (pending or done)
+            response = if status = done, we add the list of results to this else []
+       """
+    report_name = request.json["report_name"]
+    logging.info('Retrieving report for id : ' + str(id))
+    id_ = get_report_status({'name': str(report_name), "_id": ObjectId(id)})
+    response = make_response(dumps(id_), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 
 
 async def worker_fn():
+    """
+       Endpoint for report generation
+
+       Parameters:
+           str1 (str):The string which is to be reversed.
+
+       Returns:
+           reverse(str1):The string which gets reversed.
+       """
     while not work_queue.empty():
         task = await work_queue.get()
         await task
@@ -46,13 +83,3 @@ def run_periodically():
 
 
 run_periodically()
-
-
-@report_blueprint.route('/<id>', methods=['POST'])
-def report_status(id):
-    report_name = request.json["report_name"]
-    logging.info('Retrieving report for id : ' + str(id))
-    id_ = get_report_status({'name': str(report_name), "_id": ObjectId(id)})
-    response = make_response(dumps(id_), 200)
-    response.headers["Content-Type"] = "application/json"
-    return response

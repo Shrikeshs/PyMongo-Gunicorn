@@ -16,6 +16,15 @@ class Report:
 class TopKReporters(Report):
 
     async def generate_reports(self, k=str, _id=str) -> list[Any]:
+        """
+           Endpoint for report generation
+
+           Parameters:
+               str1 (str):The string which is to be reversed.
+
+           Returns:
+               reverse(str1):The string which gets reversed.
+           """
         from app.main import db
         from app.reports.insert_db import update_report
         collection_name = db["comments"]
@@ -37,10 +46,28 @@ class TopKReporters(Report):
         return result
 
     def get_report_name(self):
+        """
+           Endpoint for report generation
+
+           Parameters:
+               str1 (str):The string which is to be reversed.
+
+           Returns:
+               reverse(str1):The string which gets reversed.
+           """
         return "top_commentors"
 
     @staticmethod
     def build_cond_dict(json):
+        """
+           Endpoint for report generation
+
+           Parameters:
+               str1 (str):The string which is to be reversed.
+
+           Returns:
+               reverse(str1):The string which gets reversed.
+           """
         status = json.get("status")
         response = json.get("response")
         cond_dict = {}
