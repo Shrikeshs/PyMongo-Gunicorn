@@ -23,4 +23,6 @@ class Response:
         self.date = date
 
 
-
+class CreateResponse:
+    def __init__(self, _id=str()):
+        self._id = _id
