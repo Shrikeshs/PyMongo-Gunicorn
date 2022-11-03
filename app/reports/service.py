@@ -1,4 +1,3 @@
-import asyncio
 from abc import abstractmethod
 from typing import Any
 
@@ -17,13 +16,13 @@ class TopKReporters(Report):
 
     async def generate_reports(self, k=str, _id=str) -> list[Any]:
         """
-           Endpoint for report generation
+           Implemented fn to generate reports
 
            Parameters:
-               str1 (str):The string which is to be reversed.
-
+               _id (str): The report id that is being generated
+               k (str): The top 'k' commenters to generate
            Returns:
-               reverse(str1):The string which gets reversed.
+               result(list):The result of the report
            """
         from app.main import db
         from app.reports.insert_db import update_report
@@ -47,7 +46,7 @@ class TopKReporters(Report):
 
     def get_report_name(self):
         """
-           Endpoint for report generation
+           Fn to generate report name
 
            Parameters:
                str1 (str):The string which is to be reversed.
@@ -60,10 +59,10 @@ class TopKReporters(Report):
     @staticmethod
     def build_cond_dict(json):
         """
-           Endpoint for report generation
+           fn to build result dictionary
 
            Parameters:
-               str1 (str):The string which is to be reversed.
+               json (dict):The dict containing the report_status response from MongoDb
 
            Returns:
                reverse(str1):The string which gets reversed.

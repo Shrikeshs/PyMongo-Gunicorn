@@ -62,14 +62,8 @@ def report_status(id):
 
 async def worker_fn():
     """
-       Endpoint for report generation
-
-       Parameters:
-           str1 (str):The string which is to be reversed.
-
-       Returns:
-           reverse(str1):The string which gets reversed.
-       """
+       Consumer fn to consume the worker queue with tasks
+    """
     while not work_queue.empty():
         task = await work_queue.get()
         await task

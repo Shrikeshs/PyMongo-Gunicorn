@@ -13,13 +13,14 @@ def build_response(result):
 
 def get_report_status(request_json):
     """
-       Endpoint for report generation
+       Db service fn to get status report from report_status collection
+       from MongoDB
 
        Parameters:
-           str1 (str):The string which is to be reversed.
+           request_json (dict):The json which contains the filters to find the report
 
        Returns:
-           reverse(str1):The string which gets reversed.
+           result: report status that is to be returned
        """
     from app.main import db_sync
     report_collection = db_sync["report_status"]
@@ -33,13 +34,19 @@ def get_report_status(request_json):
 
 def insert_report_status(report_name, status, response):
     """
-       Endpoint for report generation
+        Db service fn to insert the report status
 
        Parameters:
-           str1 (str):The string which is to be reversed.
+           report_name (str):The report name that is to be generated.
+           status (str):The status of the report.
+           response (list):The response list containing the report results.
 
        Returns:
-           reverse(str1):The string which gets reversed.
+            Json response of the report status structured as follows
+            _id = id of report
+            name = name of the required report
+            status = status of the report (pending or done)
+            response = if status = done, we add the list of results to this else []
        """
     from app.main import db_sync
     report_collection = db_sync["report_status"]
@@ -52,13 +59,12 @@ def insert_report_status(report_name, status, response):
 
 def update_report(_id, status, result):
     """
-       Endpoint for report generation
+      Db service fn for updating report with response and status update.
 
        Parameters:
-           str1 (str):The string which is to be reversed.
-
-       Returns:
-           reverse(str1):The string which gets reversed.
+           _id (str):The string which is to be reversed.
+           status (str):The status of the report.
+           result (list):The response list containing the report results.
        """
     from app.main import db
     report_collection = db["report_status"]
