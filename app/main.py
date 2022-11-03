@@ -1,6 +1,3 @@
-import asyncio
-import concurrent
-
 from flask import Flask
 
 from app.comments.api import comment_blueprint

@@ -5,13 +5,15 @@ import threading
 
 from bson import ObjectId
 from bson.json_util import dumps
-from flask import request, make_response, Blueprint, abort
-from app.reports.insert_db import insert_report_status, get_report_status
+from flask import request, make_response, Blueprint
+from app.reports.insert_db import insert_report_status, get_report_status, insert_report_tasks, get_enqueue_tasks, \
+    update_report_tasks
 from app.util import list_of_reports
 
 report_blueprint = Blueprint("report", __name__, url_prefix='/reports')
 
-work_queue = asyncio.Queue(5)
+maxsize = 5
+work_queue = asyncio.Queue(maxsize)
 
 
 @report_blueprint.route('/', methods=['POST'])
@@ -19,19 +21,23 @@ async def report_generator():
     """
      Endpoint for report generation
      Returns:
-         Json response of the Id of the report stored in Mongo Db
+         Json response of the id of the report stored in Mongo Db
      """
-    if work_queue.full():
-        logging.warning('Worker is full.')
-        abort(400, description="Worker is full, please try after sometime")
     report_name = request.json["report_name"]
     k = request.json["k"]
     report_obj = list_of_reports[report_name]
     from app.util import loop
-    result_dict = insert_report_status(report_name, 'pending', [])
     logging.info('Report has been inserted to MongoDb')
-    reports_task = loop.create_task(report_obj.generate_reports(k, result_dict["_id"]))
-    work_queue.put_nowait(reports_task)
+    result_dict = insert_report_status(report_name, 'pending', [])
+    task_inserted_id = insert_report_tasks(report_name, result_dict["_id"])
+    logging.info('Task has been inserted to MongoDb' + str(task_inserted_id))
+    db_report_tasks = get_enqueue_tasks()
+    while not work_queue.full() and len(db_report_tasks):
+        db_task = db_report_tasks.pop()
+        report_id = db_task.get("report_id")
+        reports_task = loop.create_task(report_obj.generate_reports(k, report_id))
+        work_queue.put_nowait(reports_task)
+        update_report_tasks(db_task.get("_id"))
     response = make_response(json.dumps(result_dict), 202)
     response.headers["Content-Type"] = "application/json"
     return response
@@ -51,7 +57,7 @@ def report_status(id):
             name = name of the required report
             status = status of the report (pending or done)
             response = if status = done, we add the list of results to this else []
-       """
+    """
     report_name = request.json["report_name"]
     logging.info('Retrieving report for id : ' + str(id))
     id_ = get_report_status({'name': str(report_name), "_id": ObjectId(id)})

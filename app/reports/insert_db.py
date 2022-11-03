@@ -73,3 +73,33 @@ def update_report(_id, status, result):
     new_value = {"$set": cond_dict}
     logging.info('Updating report with id -> ' + str(filter_for_id))
     report_collection.update_one(filter_for_id, new_value)
+
+
+def insert_report_tasks(report_name, _id):
+    from app.main import db_sync
+    report_collection = db_sync["report_tasks"]
+    request_json = {"name": report_name, "report_id": _id, "status": "enqueued"}
+    id_inserted = report_collection.insert_one(request_json)
+    return id_inserted.inserted_id
+
+
+def get_enqueue_tasks():
+    from app.main import db_sync
+    report_collection = db_sync["report_tasks"]
+    filter_for_id = {'status': "enqueued"}
+    find = report_collection.find(filter_for_id)
+    results = []
+    for doc in find:
+        results.append(doc)
+    if len(results):
+        return results
+    return None
+
+
+def update_report_tasks(_id):
+    from app.main import db_sync
+    report_collection = db_sync["report_tasks"]
+    filter_for_id = {'_id': ObjectId(_id)}
+    cond_dict = {"status": "done"}
+    new_value = {"$set": cond_dict}
+    report_collection.update_one(filter_for_id, new_value)
