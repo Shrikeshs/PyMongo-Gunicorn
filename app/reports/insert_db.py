@@ -75,30 +75,19 @@ def update_report(_id, status, result):
     report_collection.update_one(filter_for_id, new_value)
 
 
-def insert_report_tasks(report_name, _id):
-    from app.main import db_sync
-    report_collection = db_sync["report_tasks"]
-    request_json = {"name": report_name, "report_id": _id, "status": "enqueued"}
-    id_inserted = report_collection.insert_one(request_json)
-    return id_inserted.inserted_id
-
-
 def get_enqueue_tasks():
     from app.main import db_sync
-    report_collection = db_sync["report_tasks"]
+    report_collection = db_sync["report_status"]
     filter_for_id = {'status': "enqueued"}
-    find = report_collection.find(filter_for_id)
-    results = []
-    for doc in find:
-        results.append(doc)
-    if len(results):
-        return results
-    return None
+    find = report_collection.find_one(filter_for_id)
+    if find is not None:
+        return find
+    return {}
 
 
 def update_report_tasks(_id):
     from app.main import db_sync
-    report_collection = db_sync["report_tasks"]
+    report_collection = db_sync["report_status"]
     filter_for_id = {'_id': ObjectId(_id)}
     cond_dict = {"status": "done"}
     new_value = {"$set": cond_dict}

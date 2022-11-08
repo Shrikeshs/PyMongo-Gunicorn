@@ -26,3 +26,17 @@ class Response:
 class CreateResponse:
     def __init__(self, _id=str()):
         self._id = _id
+
+
+class ResponseMetadata:
+    def __init__(self, next=str(), previous=str(), has_next=False, has_previous=False) -> None:
+        self.has_next = has_next
+        self.has_previous = has_previous
+        self.previous = previous
+        self.next = next
+
+
+class PaginatedResponse:
+    def __init__(self, data=list, metadata=dict):
+        self.data = data
+        self.metadata = metadata

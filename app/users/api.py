@@ -1,4 +1,5 @@
 from bson import json_util
+from bson.json_util import dumps
 from flask import Blueprint, request, abort, jsonify, make_response
 
 from app.models import Users
@@ -31,19 +32,17 @@ def delete_user():
 
 
 @user_blueprint.route('/', methods=['GET'])
-def list_users():
-    from app.users.service import db_list_comments
-    items = db_list_comments()
-    response = make_response(items, 200)
+def query_users():
+    request_args = request.args
+    limit = int(request_args["size"])
+    next_id = request_args["next_id"]
+    sort_by = request_args["sort"]
+    sort_order = request_args["sort_order"]
+    from app.users.service import db_query_users_with_cursor
+    items = db_query_users_with_cursor(limit, next_id, sort_by, sort_order)
+    response = make_response(dumps(items.__dict__), 200)
     response.headers["Content-Type"] = "application/json"
     return response
-
-
-@user_blueprint.route('/', methods=['POST'])
-def query_users():
-    from app.users.service import db_query_comments
-    items = db_query_comments(request.json)
-    return json_util.dumps(items)
 
 
 @user_blueprint.errorhandler(400)

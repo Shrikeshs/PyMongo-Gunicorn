@@ -1,8 +1,8 @@
 import json
 
 from bson import ObjectId
+from bson.json_util import dumps
 from flask import request, Blueprint, jsonify, abort, make_response
-
 
 
 comment_blueprint = Blueprint("comment", __name__, url_prefix='/comments')
@@ -34,12 +34,26 @@ def delete_comment(id):
     return response
 
 
+# @comment_blueprint.route('/', methods=['GET'])
+# def query_comments():
+#     request_args = request.args
+#     page_number = int(request_args["page"])
+#     page_size = int(request_args["size"])
+#     from app.comments.service import db_query_comments
+#     items = db_query_comments(page_size, page_number)
+#     PaginatedResponse()
+#     response = make_response(json.dumps(items), 200)
+#     response.headers["Content-Type"] = "application/json"
+#     return response
+
 @comment_blueprint.route('/', methods=['GET'])
 def query_comments():
     request_args = request.args
-    from app.comments.service import db_query_comments
-    items = db_query_comments(request_args)
-    response = make_response(json.dumps(items), 200)
+    limit = int(request_args["size"])
+    next_id = request_args["next_id"]
+    from app.comments.service import db_query_users_with_cursor
+    items = db_query_users_with_cursor(limit, next_id)
+    response = make_response(dumps(items.__dict__), 200)
     response.headers["Content-Type"] = "application/json"
     return response
 

@@ -4,7 +4,7 @@ from typing import Any
 
 class Report:
     @abstractmethod
-    async def generate_reports(self, k=str, id=str) -> list[Any]:
+    async def generate_reports(self, k=dict, id=str) -> list[Any]:
         pass
 
     @abstractmethod
@@ -14,16 +14,18 @@ class Report:
 
 class TopKReporters(Report):
 
-    async def generate_reports(self, k=str, _id=str) -> list[Any]:
+    async def generate_reports(self, request_json=dict, _id=str) -> list[Any]:
         """
            Implemented fn to generate reports
 
            Parameters:
                _id (str): The report id that is being generated
-               k (str): The top 'k' commenters to generate
+               request_json (dict): The top 'k' commenters to generate
            Returns:
                result(list):The result of the report
+
            """
+        k = request_json["k"]
         from app.main import db
         from app.reports.insert_db import update_report
         collection_name = db["comments"]
@@ -38,6 +40,7 @@ class TopKReporters(Report):
         limit = {"$limit": limit_number}
         pipeline = [stage_group_comment, sort, limit]
         result = []
+
         aggregate = collection_name.aggregate(pipeline)
         async for doc in aggregate:
             result.append(doc)
@@ -48,11 +51,6 @@ class TopKReporters(Report):
         """
            Fn to generate report name
 
-           Parameters:
-               str1 (str):The string which is to be reversed.
-
-           Returns:
-               reverse(str1):The string which gets reversed.
            """
         return "top_commentors"
 
@@ -66,7 +64,7 @@ class TopKReporters(Report):
 
            Returns:
                reverse(str1):The string which gets reversed.
-           """
+        """
         status = json.get("status")
         response = json.get("response")
         cond_dict = {}
