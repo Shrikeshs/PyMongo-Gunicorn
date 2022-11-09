@@ -1,10 +1,16 @@
+import atexit
 import logging
+import threading
+import time
 from typing import Any
 
 from bson import ObjectId
 from pymongo import ReturnDocument
 
+
 from app.reports.insert_db import get_enqueue_tasks
+
+keep_running = True
 
 
 def generate_reports(k=int, _id=str) -> list[Any]:
@@ -103,14 +109,23 @@ def build_cond_dict(json):
     return cond_dict
 
 
-def worker_fn():
+def exit_handler():
+    print('My application is ending!')
+
+
+def worker_fn(keep_loop_running):
     """
-       Consumer fn to consume the worker queue with tasks
+       Consumer fn to consume the worker queue in mongo db with tasks
     """
-    while True:
-        db_report_tasks = get_enqueue_tasks()
-        if db_report_tasks is not None and len(db_report_tasks):
-            print("Processing Task, report_id : " + str(db_report_tasks["_id"]))
-            k = db_report_tasks["k"]
-            reports = generate_reports(k, db_report_tasks["_id"])
-            update_report(db_report_tasks["_id"], 'done', reports)
+    while keep_loop_running:
+        try:
+            db_report_task = get_enqueue_tasks()
+            if db_report_task is not None:
+                logging.info(f"Thread {threading.currentThread().getName()} is picking up db task with _id {db_report_task['_id']}")
+                logging.info("Processing Task, report_id : " + str(db_report_task["_id"]))
+                k = db_report_task["k"]
+                reports = generate_reports(k, db_report_task["_id"])
+                update_report(db_report_task["_id"], 'done', reports)
+        except RuntimeError as e:
+            logging.info("RunTime exception raised while running threads in the background " + str(e))
+    logging.info("The background threads have been stopped...")

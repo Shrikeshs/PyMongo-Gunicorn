@@ -1,0 +1,40 @@
+INFO:root:Thread Thread-3 is running in the background
+INFO:root:Thread Thread-4 is running in the background
+INFO:root:Thread Thread-5 is running in the background
+INFO:root:Thread Thread-6 is running in the background
+INFO:root:Thread Thread-7 is running in the background
+INFO:root:Shutting Down background threads..
+ERROR:app.main:Exception on /shutdown [POST]
+Traceback (most recent call last):
+  File "/Users/shrikesh/PycharmProjects/Mflix_New/venv/lib/python3.9/site-packages/flask/app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/shrikesh/PycharmProjects/Mflix_New/venv/lib/python3.9/site-packages/flask/app.py", line 1823, in full_dispatch_request
+    return self.finalize_request(rv)
+  File "/Users/shrikesh/PycharmProjects/Mflix_New/venv/lib/python3.9/site-packages/flask/app.py", line 1842, in finalize_request
+    response = self.make_response(rv)
+  File "/Users/shrikesh/PycharmProjects/Mflix_New/venv/lib/python3.9/site-packages/flask/app.py", line 2134, in make_response
+    raise TypeError(
+TypeError: The view function for 'shutdown_threads' did not return a valid response. The function either returned None or ended without a return statement.
+INFO:root:Thread Thread-3 is running in the background
+INFO:root:Thread Thread-4 is running in the background
+INFO:root:Thread Thread-5 is running in the background
+INFO:root:Thread Thread-6 is running in the background
+INFO:root:Thread Thread-7 is running in the background
+INFO:root:Shutting Down background threads..
+INFO:root:Thread Thread-3 is running in the background
+INFO:root:Thread Thread-4 is running in the background
+INFO:root:Thread Thread-5 is running in the background
+INFO:root:Thread Thread-6 is running in the background
+INFO:root:Thread Thread-7 is running in the background
+INFO:root:Thread Thread-3 is running in the background
+INFO:root:Thread Thread-4 is running in the background
+INFO:root:Thread Thread-5 is running in the background
+INFO:root:Thread Thread-6 is running in the background
+INFO:root:Thread Thread-7 is running in the background
+INFO:root:Report has been inserted to MongoDb
+INFO:root:Id has been inserted to MongoDb -> 636ba7d91b0c84c6372d420a
+INFO:root:Task has been inserted to MongoDb636ba7d91b0c84c6372d420a
+INFO:root:Thread Thread-7 is picking up db task with _id 636ba7d91b0c84c6372d420a
+INFO:root:Processing Task, report_id : 636ba7d91b0c84c6372d420a
+INFO:root:Updating report with id -> {'_id': ObjectId('636ba7d91b0c84c6372d420a')}
+INFO:root:Retrieving report for id : 636ba7d91b0c84c6372d420a

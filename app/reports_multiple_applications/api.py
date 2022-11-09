@@ -1,15 +1,12 @@
-import asyncio
-import time
 import json
 import logging
-import threading
 
 from bson import ObjectId
 from bson.json_util import dumps
 from flask import request, make_response, Blueprint
 
-from app.reports.insert_db import get_report_status, get_enqueue_tasks
-from app.reports_multiple_applications.service import insert_report_status, generate_reports, update_report
+from app.reports.insert_db import get_report_status
+from app.reports_multiple_applications.service import insert_report_status
 
 multi_report_blueprint = Blueprint("multi_report", __name__, url_prefix='/multi/reports')
 
@@ -51,6 +48,3 @@ def report_status(id):
     response = make_response(dumps(id_), 200)
     response.headers["Content-Type"] = "application/json"
     return response
-
-
-

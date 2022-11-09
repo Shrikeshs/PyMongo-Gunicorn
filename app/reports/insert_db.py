@@ -1,6 +1,7 @@
 import logging
 
 from bson import ObjectId
+from pymongo import ReturnDocument
 
 from app.reports.service import TopKReporters
 
@@ -79,10 +80,12 @@ def get_enqueue_tasks():
     from app.main import db_sync
     report_collection = db_sync["report_status"]
     filter_for_id = {'status': "enqueued"}
-    find = report_collection.find_one(filter_for_id)
-    if find is not None:
-        return find
-    return {}
+    from app.reports_multiple_applications.service import build_cond_dict
+    cond_dict = build_cond_dict({"status": "running"})
+    find = report_collection.find_one_and_update(filter_for_id,
+                                                 {"$set": cond_dict},
+                                                 return_document=ReturnDocument.AFTER)
+    return find
 
 
 def update_report_tasks(_id):
