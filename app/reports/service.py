@@ -12,6 +12,7 @@ class Report:
         pass
 
 
+
 class TopKReporters(Report):
 
     async def generate_reports(self, request_json=dict, _id=str) -> list[Any]:

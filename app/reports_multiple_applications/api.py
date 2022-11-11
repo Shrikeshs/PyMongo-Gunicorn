@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -7,6 +8,8 @@ from flask import request, make_response, Blueprint
 
 from app.reports.insert_db import get_report_status
 from app.reports_multiple_applications.service import insert_report_status
+
+loop = asyncio.new_event_loop()
 
 multi_report_blueprint = Blueprint("multi_report", __name__, url_prefix='/multi/reports')
 

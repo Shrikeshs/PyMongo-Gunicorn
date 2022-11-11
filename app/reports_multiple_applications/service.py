@@ -1,16 +1,14 @@
-import atexit
+import asyncio
 import logging
+import sys
 import threading
-import time
+
 from typing import Any
 
 from bson import ObjectId
 from pymongo import ReturnDocument
 
-
 from app.reports.insert_db import get_enqueue_tasks
-
-keep_running = True
 
 
 def generate_reports(k=int, _id=str) -> list[Any]:
@@ -44,7 +42,7 @@ def generate_reports(k=int, _id=str) -> list[Any]:
     return result
 
 
-def insert_report_status(report_name, status, response, request_json):
+async def insert_report_status(report_name, status, response, request_json):
     """
         Db service fn to insert the report status
 
@@ -113,19 +111,23 @@ def exit_handler():
     print('My application is ending!')
 
 
-def worker_fn(keep_loop_running):
+def worker_fne(stop_event):
     """
        Consumer fn to consume the worker queue in mongo db with tasks
     """
-    while keep_loop_running:
+    logging.info("The keep_loop_running value : " + str(not stop_event.is_set()))
+    while not stop_event.is_set():
         try:
             db_report_task = get_enqueue_tasks()
             if db_report_task is not None:
-                logging.info(f"Thread {threading.currentThread().getName()} is picking up db task with _id {db_report_task['_id']}")
+                logging.info(
+                    f"Thread {threading.currentThread().getName()} is picking up db task with _id {db_report_task['_id']}")
                 logging.info("Processing Task, report_id : " + str(db_report_task["_id"]))
                 k = db_report_task["k"]
                 reports = generate_reports(k, db_report_task["_id"])
                 update_report(db_report_task["_id"], 'done', reports)
-        except RuntimeError as e:
-            logging.info("RunTime exception raised while running threads in the background " + str(e))
-    logging.info("The background threads have been stopped...")
+        except BaseException as e:
+            logging.info("Exception raised while running threads in the background " + str(e))
+    logging.info(
+        f"Thread {threading.currentThread().getName()} is shutDown")
+    sys.exit(0)
