@@ -42,7 +42,7 @@ def generate_reports(k=int, _id=str) -> list[Any]:
     return result
 
 
-async def insert_report_status(report_name, status, response, request_json):
+def insert_report_status(report_name, status, response, request_json):
     """
         Db service fn to insert the report status
 
